@@ -1,0 +1,262 @@
+# depslib dependency file v1.0
+1384814536 source:/home/u0108969/Dropbox/workspace/PiLock/main.cpp
+	<cstdlib>
+	<stdlib.h>
+	<SDL/SDL.h>
+
+1384813426 source:/home/u0108969/Dropbox/workspace/PiLock/picamera.cpp
+
+1384813379 source:/home/u0108969/Dropbox/workspace/PiLock/wiegand.cpp
+
+1385407547 source:/home/kmallory/Dropbox/workspace/PiLock/main.cpp
+	<cstdlib>
+	<stdlib.h>
+	<SDL/SDL.h>
+
+1384813426 source:/home/kmallory/Dropbox/workspace/PiLock/picamera.cpp
+
+1386298800 source:/home/kmallory/Dropbox/workspace/PiLock/wiegand.cpp
+	"wiegand.h"
+
+1386263793 source:/home/kmallory/Dropbox/workspace/PiLock/camera.cpp
+	"camera.h"
+	<stdio.h>
+
+1386263793 /home/kmallory/Dropbox/workspace/PiLock/camera.h
+	"mmalincludes.h"
+	"cameracontrol.h"
+
+1386263794 /home/kmallory/Dropbox/workspace/PiLock/mmalincludes.h
+	"bcm_host.h"
+	"interface/vcos/vcos.h"
+	"interface/mmal/mmal.h"
+	"interface/mmal/mmal_logging.h"
+	"interface/mmal/mmal_buffer.h"
+	"interface/mmal/util/mmal_util.h"
+	"interface/mmal/util/mmal_util_params.h"
+	"interface/mmal/util/mmal_default_components.h"
+	"interface/mmal/util/mmal_connection.h"
+
+1386263793 /home/kmallory/Dropbox/workspace/PiLock/cameracontrol.h
+	"interface/mmal/mmal.h"
+
+1386263793 source:/home/kmallory/Dropbox/workspace/PiLock/cameracontrol.cpp
+	<stdio.h>
+	<memory.h>
+	"interface/vcos/vcos.h"
+	"interface/vmcs_host/vc_vchi_gencmd.h"
+	"interface/mmal/mmal.h"
+	"interface/mmal/mmal_logging.h"
+	"interface/mmal/util/mmal_util.h"
+	"interface/mmal/util/mmal_util_params.h"
+	"interface/mmal/util/mmal_default_components.h"
+	"cameracontrol.h"
+
+1386812211 source:/home/kmallory/Dropbox/workspace/PiLock/database.cpp
+	<database.h>
+
+1386303572 source:/home/kmallory/Dropbox/workspace/PiLock/graphics.cpp
+	<graphics.h>
+	<database.h>
+
+1386263794 /home/kmallory/Dropbox/workspace/PiLock/wiegand.h
+	<stdio.h>
+	<stdlib.h>
+	<wiringPi.h>
+	<time.h>
+	<unistd.h>
+	<memory.h>
+
+1386814167 source:/home/kmallory/Dropbox/workspace/PiLock/Event.cpp
+	"Event.h"
+
+1386812242 /home/kmallory/Dropbox/workspace/PiLock/Event.h
+	<time.h>
+	<inttypes.h>
+	"ts_util.h"
+
+1386802787 /home/kmallory/Dropbox/workspace/PiLock/ts_util.h
+
+1386812233 source:/home/kmallory/Dropbox/workspace/PiLock/Timer.cpp
+	<stdio.h>
+	<unistd.h>
+	<pthread.h>
+	"Timer.h"
+
+1386812237 /home/kmallory/Dropbox/workspace/PiLock/Timer.h
+	<inttypes.h>
+	<pthread.h>
+	"Event.h"
+	"ts_util.h"
+
+1386266423 /home/kmallory/Dropbox/workspace/PiLock/database.h
+	<cstdlib>
+	<string>
+	<iostream>
+	<stdlib.h>
+	<stdio.h>
+	<stdlib.h>
+	<time.h>
+	<sqlite3.h>
+	<opencv/cv.h>
+
+1397279471 source:/run/user/1000/gvfs/sftp:host=24.2.101.220,port=18723,user=keymaster/home/keymaster/PiLock/camera.cpp
+	"camera.h"
+	<stdio.h>
+	<syslog.h>
+
+1397278932 /run/user/1000/gvfs/sftp:host=24.2.101.220,port=18723,user=keymaster/home/keymaster/PiLock/camera.h
+	"mmalincludes.h"
+	"cameracontrol.h"
+
+1387823474 /run/user/1000/gvfs/sftp:host=24.2.101.220,port=18723,user=keymaster/home/keymaster/PiLock/mmalincludes.h
+	"bcm_host.h"
+	"interface/vcos/vcos.h"
+	"interface/mmal/mmal.h"
+	"interface/mmal/mmal_logging.h"
+	"interface/mmal/mmal_buffer.h"
+	"interface/mmal/util/mmal_util.h"
+	"interface/mmal/util/mmal_util_params.h"
+	"interface/mmal/util/mmal_default_components.h"
+	"interface/mmal/util/mmal_connection.h"
+
+1387823474 /run/user/1000/gvfs/sftp:host=24.2.101.220,port=18723,user=keymaster/home/keymaster/PiLock/cameracontrol.h
+	"interface/mmal/mmal.h"
+
+1387823474 source:/run/user/1000/gvfs/sftp:host=24.2.101.220,port=18723,user=keymaster/home/keymaster/PiLock/cameracontrol.cpp
+	<stdio.h>
+	<memory.h>
+	"interface/vcos/vcos.h"
+	"interface/vmcs_host/vc_vchi_gencmd.h"
+	"interface/mmal/mmal.h"
+	"interface/mmal/mmal_logging.h"
+	"interface/mmal/util/mmal_util.h"
+	"interface/mmal/util/mmal_util_params.h"
+	"interface/mmal/util/mmal_default_components.h"
+	"cameracontrol.h"
+
+1397280064 source:/run/user/1000/gvfs/sftp:host=24.2.101.220,port=18723,user=keymaster/home/keymaster/PiLock/database.cpp
+	<database.h>
+
+1397280064 /run/user/1000/gvfs/sftp:host=24.2.101.220,port=18723,user=keymaster/home/keymaster/PiLock/database.h
+	<cstdlib>
+	<string>
+	<iostream>
+	<stdlib.h>
+	<stdio.h>
+	<stdlib.h>
+	<time.h>
+	<sqlite3.h>
+	<opencv/cv.h>
+	<curl/curl.h>
+	<onion/dict.h>
+	<syslog.h>
+
+1397278517 source:/run/user/1000/gvfs/sftp:host=24.2.101.220,port=18723,user=keymaster/home/keymaster/PiLock/Event.cpp
+	"Event.h"
+
+1397279406 /run/user/1000/gvfs/sftp:host=24.2.101.220,port=18723,user=keymaster/home/keymaster/PiLock/Event.h
+	<stdio.h>
+	<time.h>
+	<inttypes.h>
+	<wiringPi.h>
+	<syslog.h>
+	"ts_util.h"
+
+1387823474 /run/user/1000/gvfs/sftp:host=24.2.101.220,port=18723,user=keymaster/home/keymaster/PiLock/ts_util.h
+
+1397280062 source:/run/user/1000/gvfs/sftp:host=24.2.101.220,port=18723,user=keymaster/home/keymaster/PiLock/main.cpp
+	<cstdlib>
+	<string>
+	<iostream>
+	<stdlib.h>
+	<stdio.h>
+	<time.h>
+	<pthread.h>
+	<signal.h>
+	<execinfo.h>
+	<ucontext.h>
+	<wiringPi.h>
+	<graphics.h>
+	<wiegand.h>
+	<database.h>
+	<Timer.h>
+	<webinterface.h>
+
+1397280067 /run/user/1000/gvfs/sftp:host=24.2.101.220,port=18723,user=keymaster/home/keymaster/PiLock/graphics.h
+	<cstdlib>
+	<string>
+	<iostream>
+	<vector>
+	<stdlib.h>
+	<stdio.h>
+	<fcntl.h>
+	<fcntl.h>
+	<linux/fb.h>
+	<sys/mman.h>
+	<sys/ioctl.h>
+	<linux/kd.h>
+	<SDL/SDL.h>
+	<SDL/SDL_gfxPrimitives.h>
+	<SDL/SDL_image.h>
+	<SDL/SDL_rotozoom.h>
+	<SDL/SDL_ttf.h>
+	<jpeglib.h>
+	<camera.h>
+	<opencv/cv.h>
+	<opencv/highgui.h>
+	<opencv/ml.h>
+	"opencv2/objdetect/objdetect.hpp"
+	"opencv2/highgui/highgui.hpp"
+	"opencv2/imgproc/imgproc.hpp"
+
+1397277410 /run/user/1000/gvfs/sftp:host=24.2.101.220,port=18723,user=keymaster/home/keymaster/PiLock/wiegand.h
+	<stdio.h>
+	<stdlib.h>
+	<wiringPi.h>
+	<time.h>
+	<unistd.h>
+	<memory.h>
+	<syslog.h>
+
+1387823474 /run/user/1000/gvfs/sftp:host=24.2.101.220,port=18723,user=keymaster/home/keymaster/PiLock/Timer.h
+	<inttypes.h>
+	<pthread.h>
+	<wiringPi.h>
+	"Event.h"
+	"ts_util.h"
+
+1397280065 /run/user/1000/gvfs/sftp:host=24.2.101.220,port=18723,user=keymaster/home/keymaster/PiLock/webinterface.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<pthread.h>
+	<onion/log.h>
+	<onion/onion.h>
+	<onion/dict.h>
+	<onion/handler.h>
+	<onion/request.h>
+	<onion/response.h>
+	<onion/shortcuts.h>
+	<onion/types.h>
+	<onion/extras/png.h>
+	<database.h>
+	<graphics.h>
+
+1387823474 source:/run/user/1000/gvfs/sftp:host=24.2.101.220,port=18723,user=keymaster/home/keymaster/PiLock/Timer.cpp
+	<stdio.h>
+	<unistd.h>
+	<pthread.h>
+	"Timer.h"
+
+1387830593 source:/run/user/1000/gvfs/sftp:host=24.2.101.220,port=18723,user=keymaster/home/keymaster/PiLock/ts_util.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<limits.h>
+	<time.h>
+	"ts_util.h"
+
+1397278421 source:/run/user/1000/gvfs/sftp:host=24.2.101.220,port=18723,user=keymaster/home/keymaster/PiLock/wiegand.cpp
+	"wiegand.h"
+
