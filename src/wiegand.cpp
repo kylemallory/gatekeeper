@@ -27,19 +27,22 @@ void data1Pulse(void)
 
 int wiegandInit(int d0pin, int d1pin)
 {
+		int err = 0;
     // Setup wiringPi
     syslog(LOG_NOTICE, "Configuring Wiegand RFID/Keypad...\n");
-//    if ( wiringPiSetup() != 0) {
-//        syslog(LOG_ERR, "Error initializing RasbPi GPIO framework.\n" );
-//        return 1;
-//    }
+    if ( wiringPiSetup() != 0) {
+        syslog(LOG_ERR, "Error initializing RasbPi GPIO framework.\n" );
+        return 1;
+    }
     pinMode(d0pin, INPUT);
     pinMode(d1pin, INPUT);
 
-    if ( (wiringPiISR(d0pin, INT_EDGE_FALLING, data0Pulse) != 0) ||
-            (wiringPiISR(d1pin, INT_EDGE_FALLING, data1Pulse) != 0) )
-    {
-        syslog(LOG_ERR, "Error initializing RasbPi GPIO framework.\n" );
+		syslog(LOG_NOTICE, "Registering hardware interrupts...\n");
+		err |= (wiringPiISR(d0pin, INT_EDGE_FALLING, data0Pulse) != 0);
+		err |= (wiringPiISR(d1pin, INT_EDGE_FALLING, data1Pulse) != 0);
+
+    if (err) {
+        syslog(LOG_ERR, "Error initializing RasbPi GPIO ISR framework.\n" );
         return 1;
     }
 

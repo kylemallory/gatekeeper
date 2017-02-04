@@ -39,7 +39,9 @@
 #include <database.h>
 #include <graphics.h>
 
+#ifdef CAMERA
 extern CCamera* g_cam;
+#endif
 
 int initWebInterface(void);
 // int sendMMSemail(char *fromAddr, char *toAddr[], char *body);

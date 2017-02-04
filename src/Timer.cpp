@@ -34,12 +34,15 @@ static void *timerHandler(void *vpTimer) {
     return NULL;
 }
 
-Timer::Timer(void)
+Timer::Timer(const char *timerName)
 {
     //threadStatus = 1; // must set this first, or timerHandler might terminate early
     // this->eventMutex = PTHREAD_MUTEX_INITIALIZER;
     pthread_mutex_init(&eventMutex, NULL);
     pthread_create(&threadId, NULL, &timerHandler, this);
+    if (pthread_setname_np(threadId, timerName) != 0) {
+        syslog(LOG_WARNING, "Unable to set name of Timer Thread: %s", timerName);
+    }
 }
 
 Timer::~Timer() {
@@ -207,7 +210,7 @@ void Timer::stop(int8_t id)
 struct timespec sleepyTime;
 void Timer::update(void)
 {
-    sleepyTime.tv_nsec = 1L;
+    sleepyTime.tv_nsec = 100000L;
     sleepyTime.tv_sec = 0L;
     for (int8_t i = 0; i < MAX_NUMBER_OF_EVENTS; i++)
     {

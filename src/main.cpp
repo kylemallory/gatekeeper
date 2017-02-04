@@ -14,11 +14,12 @@
 #include <ucontext.h>
 #include <sys/stat.h>
 //#include <syslog.h>
+#include <errno.h>
 #include <bsd/libutil.h>
 
 #include <wiringPi.h>
 
-#include <graphics.h>
+//#include <graphics.h>
 #include <wiegand.h>
 #include <database.h>
 #include <Timer.h>
@@ -84,7 +85,8 @@ void sig_handler(int signum) {
         g_done = true;
     } else if (signum == SIGKILL){
         syslog(LOG_NOTICE, "Received SIG %d, exiting...\n", signum);
-        SDL_Quit();
+	if (!graphicsOptions.headless)
+        	SDL_Quit();
         exit(0);
     } else if (signum == SIGSEGV) {
       void *array[10];
@@ -100,7 +102,8 @@ void sig_handler(int signum) {
           backtrace_symbols_fd(array, size, fd);
           close(fd);
       }
-      SDL_Quit();
+      if (!graphicsOptions.headless)
+      	SDL_Quit();
       exit(1);
     }
 }
@@ -124,7 +127,7 @@ int doAuthorization(int mode, uint64_t keyCode) {
 
     if (isAuthorized) {
         timer->pattern(KEYPAD_BUZZER_PIN, pattern_L, 0, 1);
-        timer->latch(DOOR_STRIKE_PIN, 5000000L, 1);
+        timer->latch(DOOR_STRIKE_PIN, 50000000L, 1);
     } else
         timer->pattern(KEYPAD_BUZZER_PIN, pattern_SS, 0, 1);
 
@@ -134,14 +137,16 @@ int doAuthorization(int mode, uint64_t keyCode) {
 static void *keypadThread(void *data) {
     uint64_t keyCode = 0;
     time_t lastKeyPressTime = 0;
+    boolean running = TRUE;
 
-    timer = new Timer();
+		// instantiate timer if it hasn't been done already
+    timer = (timer == NULL) ? new Timer("keypadTimer") : timer;
     if (timer == NULL) {
         syslog(LOG_ERR, "Error initializing timer system.\n" );
         return NULL;
     }
 
-    while (1) {
+    while (running) {
         // check keypad stuff
         if ((lastKeyPressTime + 20 < time(NULL)) && (keyCode != 0)) {
             keyCode = 0;
@@ -168,6 +173,7 @@ static void *keypadThread(void *data) {
                 time(&lastKeyPressTime);
             }
         }
+        // syslog(LOG_DEBUG, "keypadThread sleeping...\n");
         usleep( 5000L );
     }
     return NULL;
@@ -211,65 +217,67 @@ int standup() {
 
     initWebInterface();
     initPiGPIO();
-    if ( wiegandInit(KEYPAD_DATA0_PIN, KEYPAD_DATA1_PIN) != 0) {
-        syslog(LOG_ERR, "Error initializing wiegand interface." );
+    if (wiegandInit(KEYPAD_DATA0_PIN, KEYPAD_DATA1_PIN) != 0) {
+        syslog(LOG_ERR, "Error initializing wiegand interface.");
         return 1;
     }
     pthread_create(&keypadThread_id, NULL, &keypadThread, NULL);
-
-    if ( initGraphics(camera_enabled) != 0) {
-        syslog(LOG_ERR, "Error initializing graphics engine.");
-        return 1;
+    if (pthread_setname_np(keypadThread_id, "keypad") != 0) {
+        syslog(LOG_WARNING, "Unable to set thread name: keypad");
     }
 
-        syslog(LOG_ERR, "Error initializing graphics engine.");
+    if (!graphicsOptions.headless) {
+        if (initGraphics(camera_enabled) != 0) {
+            syslog(LOG_ERR, "Error initializing graphics engine.");
+            return 1;
+        }
+    }
 	return 0;
 }
 
 int mainloop() {
     syslog(LOG_INFO, "Starting main process loop...");
-    SDL_Surface *screen = getScreenSurface();
     while ( !g_done )
     {
-        // message processing loop
-        SDL_Event event;
-        while ( SDL_PollEvent( &event ) )
-        {
-            // check for messages
-            switch ( event.type )
-            {
-                // exit if the window is closed
-            case SDL_QUIT:
-                //g_done = true;
-                break;
+        if (!graphicsOptions.headless) {
+            // message processing loop
+            SDL_Event event;
+            while (SDL_PollEvent(&event)) {
+                // check for messages
+                switch (event.type) {
+                    // exit if the window is closed
+                    case SDL_QUIT:
+                        //g_done = true;
+                        break;
 
-                // check for keypresses
-            case SDL_KEYDOWN:
-            {
-                // exit if ESCAPE is pressed
-                if ( event.key.keysym.sym == SDLK_ESCAPE )
-                    g_done = true;
-                break;
-            }
-            } // end switch
-        } // end of message processing
+                        // check for keypresses
+                    case SDL_KEYDOWN: {
+                        // exit if ESCAPE is pressed
+                        if (event.key.keysym.sym == SDLK_ESCAPE)
+                            g_done = true;
+                        break;
+                    }
+                } // end switch
+            } // end of message processing
 
-        // DRAWING STARTS HERE
+            // DRAWING STARTS HERE
 
-        // clear screen
-        syslog(LOG_INFO, "Drawing screen...");
-        SDL_FillRect( screen, 0, SDL_MapRGB( screen->format, 0, 0, 0 ) );
+            // clear screen
+            syslog(LOG_INFO, "Drawing screen...");
+            clearScreenSurface();
 
-		// draw the various UI elements
-		if (camera_enabled)
-            drawCameraPreview();
-        drawClock();
-        drawAccessHistory();
+            // draw the various UI elements
+            if (camera_enabled)
+                drawCameraPreview();
+            drawClock();
+            drawAccessHistory();
 
-        // finally, update the screen :)
-        SDL_Flip( screen );
-//	usleep( 50000L );
-	sleep(1);
+            // finally, update the screen :)
+            updateRenderer();
+            // SDL_Flip( screen );
+            //	usleep( 50000L );
+        }
+	usleep(10000000L);
     } // end main loop
     syslog(LOG_INFO, "Exiting main process loop...");
 
@@ -277,21 +285,26 @@ int mainloop() {
 }
 
 int teardown() {
+#ifdef CAMERA
     if (g_cam != NULL) {
         syslog(LOG_INFO, "Shutting down camera...");
         StopCamera();
     }
+#endif
 
     // free loaded bitmap
-    syslog(LOG_INFO, "Releasing surfaces...");
-    // SDL_FreeSurface( camImage );
-    SDL_FreeSurface( getScreenSurface() );
+    if (!graphicsOptions.headless) {
+        syslog(LOG_INFO, "Releasing surfaces...");
+        teardownGraphics();
+    }
 
     syslog(LOG_INFO, "Releasing Timers...");
     delete timer;
 
     // all is well ;)
-    SDL_Quit();
+    if (!graphicsOptions.headless) {
+        SDL_Quit();
+    }
     syslog(LOG_INFO, "Exited cleanly" );
     closelog();
 
@@ -306,10 +319,10 @@ int daemonize() {
 	// build PID file
 	pid_t otherpid, childpid;
 
-	pfh = pidfile_open("/var/run/pilock.pid", 0600, &otherpid);
+	pfh = pidfile_open("/var/run/gatekeeper.pid", 0600, &otherpid);
 	if (pfh == NULL) {
 		if (errno == EEXIST) {
-			fprintf(stderr, "PiLock is already running, pid: %jd.", (intmax_t)otherpid);
+			fprintf(stderr, "GateKeeper is already running, pid: %jd.", (intmax_t)otherpid);
 			exit(EXIT_FAILURE);
 		}
 		// If we cannot create pidfile from other reasons, bail.
@@ -347,7 +360,7 @@ int daemonize() {
 	pidfile_write(pfh);
 	syslog(LOG_INFO, "Successful fork, %jd started.", (intmax_t)childpid);
 
-	chdir("/home/keymaster/PiLock");
+	chdir("/usr/share/gatekeeper");
 
 	return 0;
 }
@@ -355,6 +368,7 @@ int daemonize() {
 int stupidTest() {
 	int img_buff_size = 0;
 	void *img_buff = NULL;
+#ifdef CAMERA
 	CCamera* g_cam = NULL;
 
 	g_cam = StartCamera(1280,1024, 30, 4, true);
@@ -379,11 +393,12 @@ int stupidTest() {
 	} else {
 		syslog(LOG_ERR, "Unable to access camera.\n");
 	}
+#endif
 
 	// put crap in the access log
 	sqlite3 *pDb = NULL;
 	if ((pDb = openDB("auditlog.db")) != NULL) {
-		dbLogAccessAttempt(pDb, ACCESS_RFID, "554FD0294BA", true, msgAccessGranted, 0, img_buff, img_buff_size);
+		dbLogAccessAttempt(pDb, ACCESS_RFID, 0x554FD0294BA, true, msgAccessGranted, 0, img_buff, img_buff_size);
 		closeDB(pDb);
 	}
 
@@ -399,6 +414,7 @@ int main ( int argc, char** argv ) {
 
 	setlogmask(LOG_UPTO (LOG_NOTICE)); // get this value from the config table in the database
 
+        graphicsOptions.headless = true;
 	while (i < argc) {
 
 		if (!strcmp("--fg",argv[i]) || !strcmp("--foreground",argv[i]))
@@ -411,6 +427,12 @@ int main ( int argc, char** argv ) {
 		if (!strcmp("--use-camera",argv[i])) {
             camera_enabled = true;
         }
+
+        if (!strcmp("--use-ui",argv[i])) {
+            graphicsOptions.headless = false;
+        }
+
+	    chdir("/usr/share/gatekeeper");
 
         if (!strcmp("--auth", argv[i]) && (i+1 < argc)) {
             openlog("keymaster", LOG_CONS | LOG_PID | LOG_NDELAY, LOG_LOCAL1);
@@ -452,7 +474,7 @@ int main ( int argc, char** argv ) {
 	char *body[] = { msgLine, NULL };
 
     sprintf(msgLine, "[TOYSHED] %s : PiLock was started.", timestamp);
-	sendMMSemail(fromAddr, toAddr, body, NULL);
+	sendMMSemail(fromAddr, toAddr, (const char **) body, NULL);
 
 
 	if (standup() == 0)

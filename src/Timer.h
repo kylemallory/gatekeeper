@@ -38,7 +38,7 @@ class Timer
 {
 
 public:
-    Timer(void);
+    Timer(const char *threadName);
     ~Timer();
 
     int8_t every(const struct timespec period, void (*callback)(const struct timespec drift));

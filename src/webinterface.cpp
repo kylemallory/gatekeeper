@@ -48,11 +48,11 @@ static const char *payload_text[] = {
 
 struct emailFields {
   int lines_read;
-  char *fromAddr;
-  char *toAddr[];
-  char *ccAddr[];
-  char *subject;
-  char **lines;
+  const char *fromAddr;
+  const char *toAddr[];
+  const char *ccAddr[];
+  const char *subject;
+  const char **lines;
 };
 
 static size_t payload_source(void *ptr, size_t size, size_t nmemb, void *userp)
@@ -60,7 +60,7 @@ static size_t payload_source(void *ptr, size_t size, size_t nmemb, void *userp)
   struct emailFields *upload_ctx = (struct emailFields *)userp;
   const char *data;
 
-  syslog(LOG_ERR, "payload_source() %d, %d : \n", size, nmemb, upload_ctx->lines_read);
+  syslog(LOG_ERR, "payload_source() %zu, %zu : %d\n", size, nmemb, upload_ctx->lines_read);
 
 
   if((size == 0) || (nmemb == 0) || ((size*nmemb) < 1)) {
@@ -224,7 +224,7 @@ void format_query(void *tmp, const char *key, const void *value, int flags){
 onion_connection_status accessLog_handler(void *none, onion_request *req, onion_response *res){
     char temp[1024];
     strcpy(temp, onion_request_get_path(req));
-    onion_dict_preorder(onion_request_get_query_dict(req),format_query,temp);
+    onion_dict_preorder(onion_request_get_query_dict(req), (void *) format_query, temp);
 	//printf("%s\n", temp);
 
 	onion_dict *out = onion_dict_new();
@@ -242,7 +242,7 @@ onion_connection_status accessTable_handler(void *none, onion_request *req, onio
     syslog(LOG_ERR, "Requested Access Table.\n");
 
     strcpy(temp, onion_request_get_path(req));
-    onion_dict_preorder(onion_request_get_query_dict(req),format_query,temp);
+    onion_dict_preorder(onion_request_get_query_dict(req), (void *) format_query, temp);
 	//printf("%s\n", temp);
 
 	onion_dict *out = onion_dict_new();
@@ -261,7 +261,7 @@ onion_connection_status userTable_handler(void *none, onion_request *req, onion_
     syslog(LOG_ERR, "Requested User Table.\n");
 
     strcpy(temp, onion_request_get_path(req));
-    onion_dict_preorder(onion_request_get_query_dict(req),format_query,temp);
+    onion_dict_preorder(onion_request_get_query_dict(req), (void *) format_query, temp);
 	//printf("%s\n", temp);
 
 	onion_dict *out = onion_dict_new();
@@ -277,9 +277,10 @@ onion_connection_status userTable_handler(void *none, onion_request *req, onion_
 onion_connection_status camImage_handler(void *none, onion_request *req, onion_response *res){
     char temp[1024];
     strcpy(temp, onion_request_get_path(req));
-    int result = OCS_NOT_PROCESSED;
+    onion_connection_status result = OCS_NOT_PROCESSED;
 
     // get image from camera
+#ifdef CAMERA
     int camWidth = g_cam->getOutput(0)->Width;
     int camHeight = g_cam->getOutput(0)->Height;
 
@@ -288,9 +289,10 @@ onion_connection_status camImage_handler(void *none, onion_request *req, onion_r
 
     if (img_buff != NULL) {
 		g_cam->getOutput(0)->ReadFrame(img_buff, img_buff_size);
-		result = onion_png_response((unsigned char *)img_buff, 4, camWidth, camHeight, res);
+		result = (onion_connection_status) onion_png_response((unsigned char *)img_buff, 4, camWidth, camHeight, res);
 		cvFree(&img_buff);
 	}
+#endif
 
     return result;
 }
@@ -299,7 +301,7 @@ onion_connection_status camImage_handler(void *none, onion_request *req, onion_r
  * @short adds a new user to the system
  */
 onion_connection_status userAdd_handler(void *none, onion_request *req, onion_response *res) {
-    char temp[1024];
+    //char temp[1024];
     //strcpy(temp, onion_request_get_path(req));
     //onion_dict_preorder(onion_request_get_query_dict(req),format_query,temp);
 	//printf("%s\n", temp);
@@ -310,7 +312,7 @@ onion_connection_status userAdd_handler(void *none, onion_request *req, onion_re
         return OCS_PROCESSED;
     }
 
-	onion_dict *post = onion_request_get_post_dict(req);
+	onion_dict *post = (onion_dict *) onion_request_get_post_dict(req);
 	// alternatively onion_dict *post = onion_dict_from_json(json_data);
 
 	onion_block *json = onion_dict_to_json(post);
@@ -331,10 +333,10 @@ onion_connection_status userAdd_handler(void *none, onion_request *req, onion_re
 onion_connection_status user_handler(void *none, onion_request *req, onion_response *res) {
     char temp[1024];
     strcpy(temp, onion_request_get_path(req));
-    onion_dict_preorder(onion_request_get_query_dict(req),format_query,temp);
+    onion_dict_preorder(onion_request_get_query_dict(req), (void *) format_query, temp);
 	//printf("%s\n", temp);
 
-	onion_dict *post = onion_request_get_post_dict(req);
+	onion_dict *post = (onion_dict *) onion_request_get_post_dict(req);
 	// alternatively onion_dict *post = onion_dict_from_json(json_data);
 
 	onion_block *json = onion_dict_to_json(post);
@@ -382,12 +384,12 @@ onion_connection_status sendEmail_handler(void *none, onion_request *req, onion_
     else
         sprintf(msgLine, "[TOYSHED] %s : %s %s %s access via %s using code %s: %s", accessTime, firstName, lastName, accessReason, accessType, accessCode, accessMessage);
 
-	sendMMSemail(fromAddr, toAddr, body, NULL);
+	sendMMSemail(fromAddr, toAddr, (const char **) body, NULL);
 
     if (req != NULL)
         return onion_shortcut_response("Success.", OCS_PROCESSED, req, res);
     else
-        return 0;
+        return OCS_NOT_PROCESSED;
 }
 
 onion_connection_status staticContent_handler(void *none, onion_request *req, onion_response *res) {
@@ -413,7 +415,7 @@ static void *webInterfaceThread(void *data) {
     onion_set_hostname(server, "0.0.0.0");
 	onion_set_port(server, "8120"); // 18724
 
-    ONION_INFO("Listening at http://0.0.0.0:18724");
+    syslog(LOG_INFO, "Listening at http://0.0.0.0:8120");
 
 	onion_url_add(url, "camImage.png", (void*)camImage_handler);
 	onion_url_add(url, "accessLog.json", (void*)accessLog_handler);
@@ -441,6 +443,5 @@ static void *webInterfaceThread(void *data) {
 
 int initWebInterface(){
     pthread_create(&webInterfaceThread_id, NULL, &webInterfaceThread, NULL);
-
     return 0;
 }

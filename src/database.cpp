@@ -102,7 +102,7 @@ int execStatement(sqlite3 *pDb, sqlite3_stmt *stmt) {
 		int status;
 		while ((status = sqlite3_step(stmt)) != SQLITE_DONE) {
 				if (status == SQLITE_BUSY) {
-						sleep_ms(100);
+						sleep_ms(1000);
 				} else if (status == SQLITE_ERROR) {
 						printf("Error: %s\n", sqlite3_errmsg(pDb));
 						break;
@@ -165,7 +165,7 @@ int getDictResponse(onion_dict *dict, sqlite3 *pDb, sqlite3_stmt *stmt, const ch
         status = sqlite3_step(stmt);
         if (status == SQLITE_BUSY) {
             // retry... Maybe we should sleep? and track a retry count?
-            sleep_ms(1000*1000);
+            sleep_ms(1000);
         } else if (status == SQLITE_DONE) {
             break;
         } else if (status == SQLITE_ERROR) {
@@ -386,7 +386,7 @@ int getCodeDetails(sqlite3* pDb, int method, uint64_t code, int &nearestUserId, 
 
         while ((status = sqlite3_step(stmt)) != SQLITE_DONE) {
             if (status == SQLITE_BUSY) {
-                sleep_ms(100);
+                sleep_ms(1000);
             } else if (status == SQLITE_ERROR) {
                 printf("Error: %s\n", sqlite3_errmsg(pDb));
                 break;
@@ -444,7 +444,7 @@ void dbLogAccessAttempt(sqlite3 *pDb, int method, uint64_t code, int authorized,
 
         while ((status = sqlite3_step(stmt)) != SQLITE_DONE) {
             if (status == SQLITE_BUSY) {
-                sleep_ms(100);
+                sleep_ms(1000);
             } else if (status == SQLITE_ERROR) {
                 printf("Error: %s\n", sqlite3_errmsg(pDb));
                 break;
@@ -470,7 +470,7 @@ void netLogAccessAttempt(const char *url, int method, uint64_t code, int authori
     snprintf(szCode, 48, method ? "%llu" : "%llX", code);
     snprintf(szUserID, 32, "%d", userid);
 
-    fprintf(stderr, " %s : %s : %s : %s\n", szMethod, szCode, szUserID, msg);
+    syslog(LOG_DEBUG, " %s : %s : %s : %s\n", szMethod, szCode, szUserID, msg);
 
     curl_global_init(CURL_GLOBAL_ALL);
     curl = curl_easy_init();
@@ -496,7 +496,7 @@ void netLogAccessAttempt(const char *url, int method, uint64_t code, int authori
                      CURLFORM_END);
 
         if (image != NULL) {
-            fprintf(stderr, "Adding image to POST\n");
+            syslog(LOG_NOTICE, "Adding image to POST\n");
             curl_formadd(&post, &last,
                          CURLFORM_PTRNAME, "image",
                          CURLFORM_BUFFER, "imagename.jpg",
@@ -512,7 +512,7 @@ void netLogAccessAttempt(const char *url, int method, uint64_t code, int authori
 
         res = curl_easy_perform(curl);
         if (res != CURLE_OK) {
-            fprintf(stderr, "Error posting Access Log entry: %d", res);
+            syslog(LOG_ERR, "Error posting Access Log entry: %d\n", res);
         }
 
         curl_formfree(post);

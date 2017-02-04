@@ -14,8 +14,12 @@ const static SDL_Color colorMagenta = { 255, 0, 255, 255 };
 const static SDL_Color colorBlack = { 0, 0, 0, 255 };
 
 CascadeClassifier cascade;
-CCamera* g_cam = NULL;
-SDL_Surface* screen = NULL;
+//CCamera* g_cam = NULL;
+SDL_Window* screenWindow = NULL;
+SDL_Texture* screenTexture = NULL;
+SDL_Renderer* screenRenderer = NULL;
+SDL_Surface* screenSurface = NULL;
+SDL_Rect screenSize;
 SDL_Rect faceRect[10];
 
 TTF_Font* fontConsole = NULL;
@@ -24,7 +28,7 @@ TTF_Font* fontTimeSmall = NULL;
 TTF_Font* fontLCD = NULL;
 
 td_graphicsOptions graphicsOptions;
-
+/*
 void getSDLInfo(int options)
 {
     const SDL_VideoInfo *video_info = SDL_GetVideoInfo();
@@ -57,30 +61,30 @@ void getSDLInfo(int options)
     fprintf( stderr, "vfmt->colorkey: %d\n", video_info->vfmt->colorkey );
     fprintf( stderr, "vfmt->alpha: %d\n", video_info->vfmt->alpha );
 
-    /* Get available fullscreen/hardware modes */
+    // Get available fullscreen/hardware modes
     SDL_Rect** modes = SDL_ListModes( video_info->vfmt, options);
 
-    /* Check if there are any modes available */
+    // Check if there are any modes available
     if ( modes == ( SDL_Rect** )0 )
     {
         printf( "No modes available!\n" );
         exit( -1 );
     }
 
-    /* Check if our resolution is restricted */
+    // Check if our resolution is restricted
     if ( modes == ( SDL_Rect** ) - 1 )
     {
         printf( "All resolutions available.\n" );
     }
     else
     {
-        /* Print valid modes */
+        // Print valid modes
         printf( "Available Modes\n" );
         for (int i = 0; modes[i]; ++i )
             printf( "  %d x %d\n", modes[i]->w, modes[i]->h );
     }
 }
-
+*/
 
 int initTTFonts()
 {
@@ -97,7 +101,9 @@ int initTTFonts()
     fontConsole  = TTF_OpenFont( "fonts/kimberle.ttf", 24 );
     if ( fontConsole == NULL)
     {
+	char path[512];
         syslog(LOG_ERR, "Unable to locate Console font.\n" );
+	syslog(LOG_ERR, "Looking for fonts in %s\n", getcwd(path, 511));
         return 1;
     }
 
@@ -114,6 +120,7 @@ int initTTFonts()
         syslog(LOG_ERR, "Unable to locate Small-Time font.\n" );
         return 1;
     }
+    syslog(LOG_NOTICE, "Finished loading fonts.\n");
 
     return 0;
 }
@@ -132,6 +139,7 @@ int initFaceDetector()
 
 int detectFaces(SDL_Rect* faceRects, int maxFaces)
 {
+#ifdef CAMERA
     if (g_cam == NULL)
         return 0;
 
@@ -182,6 +190,9 @@ int detectFaces(SDL_Rect* faceRects, int maxFaces)
     cvFree(&img_buff);
 
     return i;
+#else
+    return 0;
+#endif
 }
 
 int initGraphics(bool camera_enabled)
@@ -200,13 +211,21 @@ int initGraphics(bool camera_enabled)
     // getSDLInfo(SDL_FULLSCREEN);
     // make sure SDL cleans up before exit
     atexit( SDL_Quit );
-    const SDL_VideoInfo *video_info = SDL_GetVideoInfo();
-    syslog(LOG_NOTICE, "Setting the video mode (%dx%dx%dbpp, FULLSCREEN)\n", video_info->current_w, video_info->current_h, video_info->vfmt->BitsPerPixel);
-    screen = SDL_SetVideoMode( video_info->current_w, video_info->current_h, video_info->vfmt->BitsPerPixel, SDL_FULLSCREEN ); // SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_FULLSCREEN );
-    if ( !screen ) {
+    //const SDL_VideoInfo *video_info = SDL_GetVideoInfo();
+    //syslog(LOG_NOTICE, "Setting the video mode (%dx%dx%dbpp, FULLSCREEN)\n", video_info->current_w, video_info->current_h, video_info->vfmt->BitsPerPixel);
+    //screen = SDL_SetVideoMode( video_info->current_w, video_info->current_h, video_info->vfmt->BitsPerPixel, SDL_FULLSCREEN ); // SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_FULLSCREEN );
+    screenWindow = SDL_CreateWindow("Gatekeeper", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 0, 0, SDL_WINDOW_FULLSCREEN);
+    if ( !screenWindow ) {
         syslog(LOG_ERR, "Unable to set video mode: %s\n", SDL_GetError() );
         return 1;
     }
+
+    SDL_GetWindowSize(screenWindow, &screenSize.w, &screenSize.h);
+    SDL_GetWindowPosition(screenWindow, &screenSize.x, &screenSize.y);
+
+    screenRenderer = SDL_CreateRenderer(screenWindow, -1, 0);
+    screenTexture = SDL_CreateTexture(screenRenderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, screenSize.w, screenSize.h);
+    screenSurface = SDL_CreateRGBSurface(0, screenSize.w, screenSize.h, 32, 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
 
     // hide the cursor
     SDL_ShowCursor(0);
@@ -218,19 +237,26 @@ int initGraphics(bool camera_enabled)
 
     //initialize camera (camera isn't required to run)
     if (camera_enabled) {
+#ifdef CAMERA
         syslog(LOG_NOTICE, "Initializing Pi Camera...\n");
         g_cam = StartCamera(1280,1024, 30, 4, true);
         if (g_cam != NULL)
             initFaceDetector();
         else
             syslog(LOG_NOTICE, "Unable to initialize camera.  Continuing without it...");
+#endif
     }
 
     return 0;
 }
 
+void teardownGraphics() {
+    SDL_FreeSurface(screenSurface);
+}
+
 SDL_Surface* getCameraImage(int scaledWidth, int scaledHeight)
 {
+#ifdef CAMERA
     SDL_Surface* scaledBMP;
     if (g_cam != NULL) {
         // get camera image
@@ -257,15 +283,25 @@ SDL_Surface* getCameraImage(int scaledWidth, int scaledHeight)
     }
 
     return scaledBMP;
+#else
+    return NULL;
+#endif
 }
 
-SDL_Surface* getScreenSurface()
-{
-    return screen;
+void clearScreenSurface() {
+    SDL_FillRect( screenSurface, 0, SDL_MapRGB( screenSurface->format, 0, 0, 0 ) );
+}
+
+void updateRenderer() {
+    SDL_UpdateTexture( screenTexture, NULL, screenSurface->pixels, screenSurface->pitch );
+    SDL_RenderClear( screenRenderer );
+    SDL_RenderCopy( screenRenderer, screenTexture, NULL, NULL );
+    SDL_RenderPresent( screenRenderer );
 }
 
 int drawCameraPreview()
 {
+#ifdef CAMERA
     // SDL_Surface* cameraImage = getPiCameraImage( (screen->w / 2), (screen->h / 2) );
     int faces = 0;
 
@@ -324,17 +360,21 @@ int drawCameraPreview()
     }
 
     return faces;
+#else
+    return 0;
+#endif
 }
 
 void drawAccessHistory()
 {
-
-    SDL_Rect consoleDest = { 0, screen->h / 2 + 10, 0, 0 };
-
     struct stat dbStat;
     static time_t dbLastModified;
     static char auditLines[10][81];
     static int lines = -1;
+
+
+    SDL_Rect consoleDest = { 0, screenSurface->h / 2 + 10, 0, 0 };
+
 
     stat("auditlog.db", &dbStat);
     if ((lines == -1) || (dbStat.st_mtime != dbLastModified)) {
@@ -347,7 +387,7 @@ void drawAccessHistory()
         SDL_Surface* textConsole = TTF_RenderText_Blended(fontConsole, auditLines[i], c);
         //rectangleRGBA( textConsole, 0, 0, textConsole->w-1, textConsole->h-1, 255, 255, 255, 255);
         consoleDest.y += textConsole->h;
-        SDL_BlitSurface( textConsole, NULL, screen, &consoleDest);
+        SDL_BlitSurface( textConsole, NULL, screenSurface, &consoleDest);
         SDL_FreeSurface( textConsole );
     }
 }
@@ -356,17 +396,18 @@ void drawClock()
 {
     char timeStr[32];
     time_t t = time(NULL);
+
     tm* localTime = localtime(&t);
     sprintf(timeStr, "%2d:%02d:%02d", localTime->tm_hour, localTime->tm_min, localTime->tm_sec);
     SDL_Surface* textTime = TTF_RenderText_Blended(fontTimeBig, timeStr, colorYellow);
     SDL_Rect timeRect =
     {
-        (screen->w / 4) - (textTime->w / 2),
+        (screenSurface->w / 4) - (textTime->w / 2),
         0,
         textTime->w, textTime->h
     };
     //rectangleRGBA(textTime, 0, 0, textTime->w-1, textTime->h-1, 255, 255, 255, 255);
-    SDL_BlitSurface( textTime, NULL, screen, &timeRect);
+    SDL_BlitSurface( textTime, NULL, screenSurface, &timeRect);
     SDL_FreeSurface(textTime);
 
     // draw the date
@@ -375,12 +416,12 @@ void drawClock()
     SDL_Surface* textDate = TTF_RenderText_Blended(fontConsole, dateStr, colorYellow);
     SDL_Rect dateRect =
     {
-        (screen->w / 4) - (textDate->w / 2),
+        (screenSurface->w / 4) - (textDate->w / 2),
         timeRect.y + timeRect.h + 10,
         textDate->w, textDate->h
     };
     //rectangleRGBA(textDate, 0, 0, textDate->w-1, textDate->h-1, 255, 255, 255, 255);
-    SDL_BlitSurface( textDate, NULL, screen, &dateRect);
+    SDL_BlitSurface( textDate, NULL, screenSurface, &dateRect);
     SDL_FreeSurface(textDate);
 }
 
@@ -409,8 +450,8 @@ void sdlSurfaceToJPEG(SDL_Surface *m_surface, int jpegQuality, void **jpegBuffer
 	jpeg_create_compress(&cinfo);
 	jpeg_mem_dest(&cinfo, (unsigned char **)jpegBuffer, jpegLen);
 
-	cinfo.image_width      = surface->w;
-	cinfo.image_height     = surface->h;
+	cinfo.image_width      = (JDIMENSION) surface->w;
+	cinfo.image_height     = (JDIMENSION) surface->h;
 	cinfo.input_components = surface->format->BytesPerPixel;
 	cinfo.in_color_space   = JCS_RGB;
 	row_stride = surface->w * surface->format->BytesPerPixel;

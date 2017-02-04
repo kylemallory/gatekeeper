@@ -1,111 +1,135 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <CodeBlocks_project_file>
-	<FileVersion major="1" minor="6" />
+	<FileVersion major="1" minor="6"/>
 	<Project>
-		<Option title="PiLock" />
-		<Option pch_mode="2" />
-		<Option compiler="gcc" />
+		<Option title="gatekeeper"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;"/>
 		<Build>
-			<Target title="Debug">
-				<Option output="bin/Debug/PiLock" prefix_auto="1" extension_auto="1" />
-				<Option object_output="obj/Debug/" />
-				<Option type="1" />
-				<Option compiler="gcc" />
-				<Compiler>
-					<Add option="-g" />
-				</Compiler>
+			<Target title="all">
+				<Option working_dir="/mnt/gatekeeper/home/keymaster/gatekeeper"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/mnt/gatekeeper/home/keymaster/gatekeeper/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/mnt/gatekeeper/home/keymaster/gatekeeper/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/mnt/gatekeeper/home/keymaster/gatekeeper/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/mnt/gatekeeper/home/keymaster/gatekeeper/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
 			</Target>
-			<Target title="Release">
-				<Option output="bin/Release/PiLock" prefix_auto="1" extension_auto="1" />
-				<Option object_output="obj/Release/" />
-				<Option type="0" />
-				<Option compiler="gcc" />
+			<Target title="edit_cache">
+				<Option working_dir="/mnt/gatekeeper/home/keymaster/gatekeeper"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/mnt/gatekeeper/home/keymaster/gatekeeper/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/mnt/gatekeeper/home/keymaster/gatekeeper/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/mnt/gatekeeper/home/keymaster/gatekeeper/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/mnt/gatekeeper/home/keymaster/gatekeeper/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/mnt/gatekeeper/home/keymaster/gatekeeper"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/mnt/gatekeeper/home/keymaster/gatekeeper/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/mnt/gatekeeper/home/keymaster/gatekeeper/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/mnt/gatekeeper/home/keymaster/gatekeeper/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/mnt/gatekeeper/home/keymaster/gatekeeper/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="gatekeeper">
+				<Option output="/mnt/gatekeeper/home/keymaster/gatekeeper/gatekeeper" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/mnt/gatekeeper/home/keymaster/gatekeeper"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
 				<Compiler>
-					<Add option="-O2" />
+					<Add directory="/mnt/gatekeeper/home/keymaster/gatekeeper/src"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
 				</Compiler>
-				<Linker>
-					<Add option="-s" />
-				</Linker>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/mnt/gatekeeper/home/keymaster/gatekeeper/Makefile&quot;  VERBOSE=1 gatekeeper"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/mnt/gatekeeper/home/keymaster/gatekeeper/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/mnt/gatekeeper/home/keymaster/gatekeeper/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/mnt/gatekeeper/home/keymaster/gatekeeper/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="gatekeeper/fast">
+				<Option output="/mnt/gatekeeper/home/keymaster/gatekeeper/gatekeeper" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/mnt/gatekeeper/home/keymaster/gatekeeper"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/mnt/gatekeeper/home/keymaster/gatekeeper/src"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/mnt/gatekeeper/home/keymaster/gatekeeper/Makefile&quot;  VERBOSE=1 gatekeeper/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/mnt/gatekeeper/home/keymaster/gatekeeper/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/mnt/gatekeeper/home/keymaster/gatekeeper/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/mnt/gatekeeper/home/keymaster/gatekeeper/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
 			</Target>
 		</Build>
-		<Compiler>
-			<Add option="-Wall" />
-			<Add option="`sdl-config --cflags`" />
-			<Add directory="/usr/include/opencv" />
-			<Add directory="/opt/vc/include" />
-			<Add directory="/opt/vc/userland-master/interface/vcos" />
-			<Add directory="/opt/vc/userland-master" />
-			<Add directory="/opt/vc/userland-master/interface/vcos/pthreads" />
-			<Add directory="/opt/vc/userland-master/interface/vmcs_host/linux" />
-			<Add directory="/opt/vc/userland-master/host_applications/linux/libs/bcm_host/include" />
-			<Add directory="." />
-		</Compiler>
-		<Linker>
-			<Add option="`sdl-config --libs`" />
-			<Add option="-Wl,-rpath,/opt/vc/lib -rdynamic" />
-			<Add library="SDL" />
-			<Add library="SDL_image" />
-			<Add library="SDL_gfx" />
-			<Add library="SDL_ttf" />
-			<Add library="sqlite3" />
-			<Add library="wiringPi" />
-			<Add library="rt" />
-			<Add library="pthread" />
-			<Add library="mmal_core" />
-			<Add library="mmal_util" />
-			<Add library="mmal_vc_client" />
-			<Add library="vcos" />
-			<Add library="bcm_host" />
-			<Add library="GLESv2" />
-			<Add library="EGL" />
-			<Add library="opencv_core" />
-			<Add library="opencv_imgproc" />
-			<Add library="opencv_objdetect" />
-			<Add directory="/usr/lib/x86_64-linux-gnu" />
-			<Add directory="/opt/vc/lib" />
-		</Linker>
-		<Unit filename="Event.cpp" />
-		<Unit filename="Event.h" />
-		<Unit filename="Timer.cpp" />
-		<Unit filename="Timer.h" />
-		<Unit filename="auditlog.db" />
-		<Unit filename="camera.cpp" />
-		<Unit filename="camera.h" />
-		<Unit filename="cameracontrol.cpp" />
-		<Unit filename="cameracontrol.h" />
-		<Unit filename="database.cpp" />
-		<Unit filename="database.h" />
-		<Unit filename="graphics.cpp" />
-		<Unit filename="graphics.h" />
-		<Unit filename="main.cpp" />
-		<Unit filename="mmalincludes.h" />
-		<Unit filename="sqlite3pp/sqlite3pp.cpp" />
-		<Unit filename="sqlite3pp/sqlite3pp.h" />
-		<Unit filename="sqlite3pp/sqlite3ppext.cpp" />
-		<Unit filename="sqlite3pp/sqlite3ppext.h" />
-		<Unit filename="sqlite3pp/testaggregate.cpp" />
-		<Unit filename="sqlite3pp/testattach.cpp" />
-		<Unit filename="sqlite3pp/testcallback.cpp" />
-		<Unit filename="sqlite3pp/testdisconnect.cpp" />
-		<Unit filename="sqlite3pp/testfunction.cpp" />
-		<Unit filename="sqlite3pp/testinsert.cpp" />
-		<Unit filename="sqlite3pp/testinsertall.cpp" />
-		<Unit filename="sqlite3pp/testselect.cpp" />
-		<Unit filename="ts_util.c">
-			<Option compilerVar="CC" />
+		<Unit filename="/mnt/gatekeeper/home/keymaster/gatekeeper/src/Event.cpp">
+			<Option target="gatekeeper"/>
 		</Unit>
-		<Unit filename="ts_util.h" />
-		<Unit filename="useradd_html.c">
-			<Option compilerVar="CC" />
+		<Unit filename="/mnt/gatekeeper/home/keymaster/gatekeeper/src/Event.h">
+			<Option target="gatekeeper"/>
 		</Unit>
-		<Unit filename="webinterface.cpp" />
-		<Unit filename="webinterface.h" />
-		<Unit filename="wiegand.cpp" />
-		<Unit filename="wiegand.h" />
-		<Extensions>
-			<code_completion />
-			<debugger />
-			<envvars />
-		</Extensions>
+		<Unit filename="/mnt/gatekeeper/home/keymaster/gatekeeper/src/Timer.cpp">
+			<Option target="gatekeeper"/>
+		</Unit>
+		<Unit filename="/mnt/gatekeeper/home/keymaster/gatekeeper/src/Timer.h">
+			<Option target="gatekeeper"/>
+		</Unit>
+		<Unit filename="/mnt/gatekeeper/home/keymaster/gatekeeper/src/assets.h">
+			<Option target="gatekeeper"/>
+		</Unit>
+		<Unit filename="/mnt/gatekeeper/home/keymaster/gatekeeper/src/database.cpp">
+			<Option target="gatekeeper"/>
+		</Unit>
+		<Unit filename="/mnt/gatekeeper/home/keymaster/gatekeeper/src/database.h">
+			<Option target="gatekeeper"/>
+		</Unit>
+		<Unit filename="/mnt/gatekeeper/home/keymaster/gatekeeper/src/main.cpp">
+			<Option target="gatekeeper"/>
+		</Unit>
+		<Unit filename="/mnt/gatekeeper/home/keymaster/gatekeeper/src/ts_util.cpp">
+			<Option target="gatekeeper"/>
+		</Unit>
+		<Unit filename="/mnt/gatekeeper/home/keymaster/gatekeeper/src/ts_util.h">
+			<Option target="gatekeeper"/>
+		</Unit>
+		<Unit filename="/mnt/gatekeeper/home/keymaster/gatekeeper/src/webinterface.cpp">
+			<Option target="gatekeeper"/>
+		</Unit>
+		<Unit filename="/mnt/gatekeeper/home/keymaster/gatekeeper/src/webinterface.h">
+			<Option target="gatekeeper"/>
+		</Unit>
+		<Unit filename="/mnt/gatekeeper/home/keymaster/gatekeeper/src/wiegand.cpp">
+			<Option target="gatekeeper"/>
+		</Unit>
+		<Unit filename="/mnt/gatekeeper/home/keymaster/gatekeeper/src/wiegand.h">
+			<Option target="gatekeeper"/>
+		</Unit>
+		<Unit filename="/mnt/gatekeeper/home/keymaster/gatekeeper/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
 	</Project>
 </CodeBlocks_project_file>
