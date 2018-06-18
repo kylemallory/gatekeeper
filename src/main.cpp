@@ -41,9 +41,9 @@
 
 
 
-#define FROM     "<keymaster@toyshedstudios.com>"
-#define TO       "<8018310780@mms.att.net>"
-#define CC       "<info@example.com>"
+#define FROM     "<gatekeeper@domain.fqdn>"
+#define TO       "<someone@domain.fqdn>"
+#define CC       "<archive@domain.fqdn>"
 
 static const char *fromAddr = FROM;
 static const char *toAddr[] = { TO , NULL };
@@ -120,7 +120,7 @@ int doAuthorization(int mode, uint64_t keyCode) {
 
     getCodeDetails(pdb, mode, keyCode, userId, isAuthorized, reason);
     dbLogAccessAttempt(pdb, mode, keyCode, isAuthorized, reasonMsgs[reason], userId, NULL, 0);
-    netLogAccessAttempt("http://www.toyshed.net/postAccess.php", mode, keyCode, isAuthorized, reasonMsgs[reason], userId, NULL, 0);
+    netLogAccessAttempt("http://www.domain.fqdn/postAccess.php", mode, keyCode, isAuthorized, reasonMsgs[reason], userId, NULL, 0);
     sendEmail_handler(NULL, NULL, NULL);
 
     closeDB(pdb);
@@ -403,7 +403,7 @@ int stupidTest() {
 	}
 
 	// try and log to the web
-	netLogAccessAttempt("http://www.toyshed.net/postAccess.php", ACCESS_RFID, 0x554FD0294BA, true, reasonMsgs[0], 0, img_buff, img_buff_size);
+	netLogAccessAttempt("http://www.domain.fqdn/postAccess.php", ACCESS_RFID, 0x554FD0294BA, true, reasonMsgs[0], 0, img_buff, img_buff_size);
 
 	return 0;
 }
