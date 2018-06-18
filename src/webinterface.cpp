@@ -8,9 +8,9 @@ pthread_t webInterfaceThread_id;
 
 #define MULTI_PERFORM_HANG_TIMEOUT 60 * 1000
 
-#define FROM     "<keymaster@toyshedstudios.com>"
-#define TO       "<8018310780@mms.att.net>"
-#define CC       "<info@example.com>"
+#define FROM     "<gatekeeper@domain.fqdn>"
+#define TO       "<someemail@domain.fqdn>"
+#define CC       "<archive@domain.fqdn>"
 
 static const char *fromAddr = FROM;
 static const char *toAddr[] = { TO , NULL };
